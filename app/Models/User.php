@@ -45,4 +45,64 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function organizations()
+    {
+        return $this->belongsToMany(Organization::class)->withPivot('role');
+    }
+
+    /**
+     * Get the organization the user is currently active in (one-to-many inverse).
+     */
+    public function currentOrganization()
+    {
+        return $this->belongsTo(Organization::class);
+    }
+
+    /**
+     * Check if the user belongs to a specific organization.
+     */
+    public function belongsToOrganization(Organization $organization)
+    {
+        return $this->organizations->contains($organization);
+    }
+
+    /**
+     * Get the projects created by the user (one-to-many).
+     */
+    public function createdProjects()
+    {
+        return $this->hasMany(Project::class, 'user_id');
+    }
+
+    /**
+     * Get the tasks assigned to the user (one-to-many).
+     */
+    public function assignedTasks()
+    {
+        return $this->hasMany(Task::class, 'assigned_to_user_id');
+    }
+
+    /**
+     * Get the tasks created by the user (one-to-many).
+     */
+    public function createdTasks()
+    {
+        return $this->hasMany(Task::class, 'created_by_user_id');
+    }
+
+    /**
+     * Get the documents uploaded by the user (one-to-many).
+     */
+    public function uploadedDocuments()
+    {
+        return $this->hasMany(Document::class, 'uploaded_by_user_id');
+    }
+
+    /**
+     * Get the comments made by the user (one-to-many).
+     */
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }

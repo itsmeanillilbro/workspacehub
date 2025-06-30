@@ -2,15 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-class Task extends Model
+class Document extends Model
 {
-    protected $casts = [
-        'due_date' => 'datetime',
-    ];
-
     protected static function booted(): void
     {
         static::addGlobalScope('organization', function (Builder $builder) {
@@ -23,7 +19,7 @@ class Task extends Model
     // --- Relationships ---
 
     /**
-     * Get the organization that owns the task (many-to-one inverse).
+     * Get the organization that owns the document (many-to-one inverse).
      */
     public function organization()
     {
@@ -31,7 +27,7 @@ class Task extends Model
     }
 
     /**
-     * Get the project that the task belongs to (many-to-one inverse).
+     * Get the project that the document belongs to (many-to-one inverse).
      */
     public function project()
     {
@@ -39,23 +35,15 @@ class Task extends Model
     }
 
     /**
-     * Get the user this task is assigned to (many-to-one inverse).
+     * Get the user who uploaded the document (many-to-one inverse).
      */
-    public function assignedTo()
+    public function uploadedBy()
     {
-        return $this->belongsTo(User::class, 'assigned_to_user_id');
+        return $this->belongsTo(User::class, 'uploaded_by_user_id');
     }
 
     /**
-     * Get the user who created this task (many-to-one inverse).
-     */
-    public function createdBy()
-    {
-        return $this->belongsTo(User::class, 'created_by_user_id');
-    }
-
-    /**
-     * Get all of the task's comments (polymorphic one-to-many).
+     * Get all of the document's comments (polymorphic one-to-many).
      */
     public function comments()
     {
