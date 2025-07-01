@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasOrganizationScope;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Comment extends Model
 {
+    use HasOrganizationScope;
     protected static function booted(): void
     {
         static::addGlobalScope('organization', function (Builder $builder) {

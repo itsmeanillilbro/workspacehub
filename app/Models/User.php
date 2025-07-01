@@ -47,7 +47,7 @@ class User extends Authenticatable
     }
     public function organizations()
     {
-        return $this->belongsToMany(Organization::class)->withPivot('role');
+        return $this->belongsToMany(Organization::class)->withPivot('role')->withTimestamps();
     }
 
     /**
@@ -64,6 +64,18 @@ class User extends Authenticatable
     public function belongsToOrganization(Organization $organization)
     {
         return $this->organizations->contains($organization);
+    }
+
+    public function hasOrganizationRole(string $role): bool
+    {
+        if (!$this->currentOrganization) {
+            return false;
+        }
+
+        return $this->organizations()
+                    ->where('organization_id', $this->currentOrganization->id)
+                    ->wherePivot('role', $role)
+                    ->exists();
     }
 
     /**

@@ -2,51 +2,106 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreProjectRequest;
+use App\Http\Requests\UpdateProjectRequest;
+use App\Http\Resources\ProjectResource;
+use App\Http\Resources\TaskResource;
+use App\Http\Resources\DocumentResource;
 use App\Models\Project;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Resources\ProjectResource; // Import ProjectResource
-use Inertia\Inertia; // Import Inertia
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ProjectController extends Controller
 {
     /**
-     * Display a listing of the projects for the current organization.
+     * Display a listing of the resource.
      */
-    public function index()
+    public function index(): Response
     {
-        // The global scope in the Project model automatically filters by current_organization_id
-        // Eager load the creator to display in the frontend
-        $projects = Project::with('creator')->get();
+        $user = Auth::user();
+        if (!$user->current_organization_id) {
+            return Inertia::render('Projects/Index', ['projects' => []])
+                ->with('warning', 'Please select an organization to view projects.');
+        }
 
-        // Pass data to an Inertia React component
+        // Global scope will ensure only projects for the current_organization_id are returned
+        $projects = Project::with('creator')->latest()->get();
+
         return Inertia::render('Projects/Index', [
             'projects' => ProjectResource::collection($projects),
         ]);
     }
 
     /**
-     * Store a newly created project in storage.
+     * Show the form for creating a new resource.
      */
-    public function store(Request $request)
+    public function create(): Response
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'status' => ['in:active,completed,archived'],
-        ]);
-
-        $project = Project::create([
-            'organization_id' => Auth::user()->currentOrganization->id, // Automatically set
-            'user_id' => Auth::id(),
-            'name' => $request->name,
-            'description' => $request->description,
-            'status' => $request->status ?? 'active',
-        ]);
-
-        return redirect()->route('projects.index')->with('success', 'Project created successfully!');
+        return Inertia::render('Projects/Create');
     }
 
-    // You'll add show, edit, update, destroy methods following similar patterns.
-    // Remember to use ProjectResource for responses.
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreProjectRequest $request): RedirectResponse
+    {
+        $project = Project::create($request->validated());
+
+        return redirect()->route('projects.show', $project)
+            ->with('success', 'Project created successfully!');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Project $project): Response
+    {
+        // Global scope on Project model ensures user only accesses projects within their current organization
+        $project->load(['creator', 'tasks.assignedTo', 'tasks.createdBy', 'documents.uploadedBy']);
+
+        return Inertia::render('Projects/Show', [
+            'project' => ProjectResource::make($project),
+            'tasks' => TaskResource::collection($project->tasks),
+            'documents' => DocumentResource::collection($project->documents),
+        ]);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Project $project): Response
+    {
+        // Global scope ensures user only accesses projects within their current organization
+        // Policy check will go here: ->authorize('update', $project);
+        return Inertia::render('Projects/Edit', [
+            'project' => ProjectResource::make($project),
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdateProjectRequest $request, Project $project): RedirectResponse
+    {
+        // Global scope ensures user only accesses projects within their current organization
+        $project->update($request->validated());
+
+        return redirect()->route('projects.show', $project)
+            ->with('success', 'Project updated successfully!');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Project $project): RedirectResponse
+    {
+        // Global scope ensures user only accesses projects within their current organization
+        // Policy check will go here: ->authorize('delete', $project);
+        $project->delete();
+
+        return redirect()->route('projects.index')
+            ->with('success', 'Project deleted successfully!');
+    }
 }

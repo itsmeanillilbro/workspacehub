@@ -1,5 +1,10 @@
 <?php
 
+use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\OrganizationController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\UserOrganizationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -11,6 +16,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+
+       // Organization Routes
+       Route::resource('organizations', OrganizationController::class);
+       Route::post('organizations/{organization}/switch', [OrganizationController::class, 'switch'])->name('organizations.switch');
+   
+       // Organization Members Routes (Nested under organizations)
+       Route::prefix('organizations/{organization}')->name('organizations.')->group(function () {
+           Route::resource('members', UserOrganizationController::class)->except(['show', 'edit']); // invite, update role, remove
+       });
+   
+   
+       // Project Routes (These should now implicitly be scoped by current_organization_id due to global scopes)
+       Route::resource('projects', ProjectController::class);
+   
+       // Task Routes (Nested under projects)
+       Route::prefix('projects/{project}')->name('projects.')->group(function () {
+           Route::resource('tasks', TaskController::class);
+       });
+   
+       // Document Routes (Nested under projects)
+       Route::prefix('projects/{project}')->name('projects.')->group(function () {
+           Route::resource('documents', DocumentController::class);
+           Route::get('documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download');
+       });
 });
 
 require __DIR__.'/settings.php';

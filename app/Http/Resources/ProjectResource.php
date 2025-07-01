@@ -19,10 +19,13 @@ class ProjectResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'status' => $this->status,
-            'organization_id' => $this->organization_id, // Good for debugging tenant scope
-            'creator' => new UserResource($this->whenLoaded('creator')), // Load the creator relationship
+            'organization_id' => $this->organization_id, 
+            'user_id' => $this->user_id,
+            'creator' => new UserResource($this->whenLoaded('creator')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'organization' => OrganizationResource::make($this->whenLoaded('organization')),
+            'tasks_count' => $this->whenLoaded('tasks',fn() => $this->tasks->count()), 
         ];
     }
 }
