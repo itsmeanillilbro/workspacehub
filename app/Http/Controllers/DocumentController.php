@@ -21,11 +21,10 @@ class DocumentController extends Controller
      */
     public function index(Project $project): Response
     {
-        // Global scope on Document and Project models ensures user only accesses documents
-        // within their current organization and associated with the given project.
+       
         $documents = $project->documents()->with('uploadedBy')->latest()->get();
 
-        return Inertia::render('Documents/Index', [
+        return Inertia::render('documents/index', [
             'project' => $project->only('id', 'name', 'organization_id'),
             'documents' => DocumentResource::collection($documents),
         ]);
@@ -36,7 +35,7 @@ class DocumentController extends Controller
      */
     public function create(Project $project): Response
     {
-        return Inertia::render('Documents/Create', [
+        return Inertia::render('documents/create', [
             'project' => $project->only('id', 'name', 'organization_id'),
         ]);
     }
@@ -76,13 +75,13 @@ class DocumentController extends Controller
             abort(404);
         }
         $document->load('uploadedBy');
-        return Inertia::render('Documents/Show', [
+        return Inertia::render('documents/show', [
             'project' => $project->only('id', 'name', 'organization_id'),
             'document' => DocumentResource::make($document),
         ]);
     }
 
-    // You can implement update if you allow renaming or metadata changes
+   
     public function update(UpdateDocumentRequest $request, Project $project, Document $document): RedirectResponse
     {
         if ($document->project_id !== $project->id) {
@@ -101,8 +100,8 @@ class DocumentController extends Controller
         if ($document->project_id !== $project->id) {
             abort(404);
         }
-        // Policy check will go here: ->authorize('delete', $document);
-        Storage::disk('public')->delete($document->path); // Delete the file from storage
+      
+        Storage::disk('public')->delete($document->path); 
         $document->delete();
 
         return redirect()->route('projects.show', $project)
@@ -117,7 +116,7 @@ class DocumentController extends Controller
         if ($document->project_id !== $project->id) {
             abort(404);
         }
-        // Ensure user is authorized to download (via policies later)
+     
         if (!Storage::disk('public')->exists($document->path)) {
             abort(404, 'File not found.');
         }

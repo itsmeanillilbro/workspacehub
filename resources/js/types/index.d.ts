@@ -1,3 +1,4 @@
+
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
 
@@ -7,7 +8,8 @@ export interface Auth {
 
 export interface BreadcrumbItem {
     title: string;
-    href: string;
+    href?: string;
+    active?: boolean;
 }
 
 export interface NavGroup {
@@ -28,8 +30,15 @@ export interface SharedData {
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
+    flash: {
+        success?: string;
+        warning?: string;
+        error?: string;
+    };
     [key: string]: unknown;
 }
+
+export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & SharedData;
 
 export interface User {
     id: number;
@@ -40,7 +49,8 @@ export interface User {
     created_at: string;
     updated_at: string;
     current_organization_id: number | null;
-    [key: string]: unknown; // This allows for additional properties...
+    current_organization?: Organization | null;
+    [key: string]: unknown;
 }
 
 export interface Organization {
@@ -49,22 +59,24 @@ export interface Organization {
     slug: string;
     created_at: string;
     updated_at: string;
-    users_count?: number; // Optional, loaded with specific query
+    users_count?: number;
     is_current_organization?: boolean;
     current_user_is_member?: boolean;
 }
+
 export interface Project {
     id: number;
     organization_id: number;
-    user_id: number; // Creator ID
+    user_id: number;
     name: string;
     description: string | null;
-    status: 'active' | 'completed' | 'on-hold' | 'archived'; // Example statuses
+    status: 'active' | 'completed' | 'on-hold' | 'archived';
     created_at: string;
     updated_at: string;
-    creator: User; // Eager loaded relationship
+    creator: User;
     tasks_count?: number;
 }
+
 export interface Task {
     id: number;
     organization_id: number;
@@ -73,15 +85,16 @@ export interface Task {
     created_by_user_id: number;
     title: string;
     description: string | null;
-    status: 'pending' | 'in-progress' | 'completed' | 'blocked'; // Example statuses
+    status: 'pending' | 'in-progress' | 'completed' | 'blocked';
     due_date: string | null;
     priority: number;
     created_at: string;
     updated_at: string;
-    assigned_to: User | null; // Eager loaded relationship
-    created_by: User; // Eager loaded relationship
-    project?: Project; // Eager loaded, optional for nested views
+    assigned_to: User | null;
+    created_by: User;
+    project?: Project;
 }
+
 export interface Document {
     id: number;
     organization_id: number;
@@ -89,11 +102,15 @@ export interface Document {
     uploaded_by_user_id: number;
     name: string | null;
     path: string;
-    url: string; // Public URL for download/preview
+    url: string;
     mime_type: string | null;
-    size: number | null; // In bytes
+    size: number | null;
     created_at: string;
     updated_at: string;
-    uploaded_by: User; // Eager loaded relationship
-    project?: Project; // Eager loaded, optional for nested views
+    uploaded_by: User;
+    project?: Project;
+}
+
+interface OrganizationResponse {
+  data: Organization[];
 }

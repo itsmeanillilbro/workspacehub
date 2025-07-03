@@ -26,10 +26,10 @@ class ProjectController extends Controller
                 ->with('warning', 'Please select an organization to view projects.');
         }
 
-        // Global scope will ensure only projects for the current_organization_id are returned
+      
         $projects = Project::with('creator')->latest()->get();
 
-        return Inertia::render('Projects/Index', [
+        return Inertia::render('projects/index', [
             'projects' => ProjectResource::collection($projects),
         ]);
     }
@@ -39,7 +39,7 @@ class ProjectController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Projects/Create');
+        return Inertia::render('projects/create');
     }
 
     /**
@@ -58,10 +58,10 @@ class ProjectController extends Controller
      */
     public function show(Project $project): Response
     {
-        // Global scope on Project model ensures user only accesses projects within their current organization
+      
         $project->load(['creator', 'tasks.assignedTo', 'tasks.createdBy', 'documents.uploadedBy']);
 
-        return Inertia::render('Projects/Show', [
+        return Inertia::render('projects/show', [
             'project' => ProjectResource::make($project),
             'tasks' => TaskResource::collection($project->tasks),
             'documents' => DocumentResource::collection($project->documents),
@@ -73,9 +73,8 @@ class ProjectController extends Controller
      */
     public function edit(Project $project): Response
     {
-        // Global scope ensures user only accesses projects within their current organization
-        // Policy check will go here: ->authorize('update', $project);
-        return Inertia::render('Projects/Edit', [
+        
+        return Inertia::render('projects/edit', [
             'project' => ProjectResource::make($project),
         ]);
     }
@@ -85,7 +84,7 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project): RedirectResponse
     {
-        // Global scope ensures user only accesses projects within their current organization
+        
         $project->update($request->validated());
 
         return redirect()->route('projects.show', $project)
@@ -97,8 +96,7 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project): RedirectResponse
     {
-        // Global scope ensures user only accesses projects within their current organization
-        // Policy check will go here: ->authorize('delete', $project);
+       
         $project->delete();
 
         return redirect()->route('projects.index')

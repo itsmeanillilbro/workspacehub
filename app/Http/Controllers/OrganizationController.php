@@ -21,8 +21,12 @@ class OrganizationController extends Controller
     {
         $user = Auth::user();
         $organizations = $user->organizations()->withCount('users')->get();
-
-        return Inertia::render('Organizations/Index', [
+        $organizations = $organizations->map(function ($org) use ($user) {
+            $org->is_current_organization = $user->current_organization_id === $org->id;
+            return $org;
+        });
+        // dd($organizations->toArray());
+        return Inertia::render('organizations/index', [
             'organizations' => OrganizationResource::collection($organizations),
             'currentOrganizationId' => $user->current_organization_id,
         ]);
@@ -33,7 +37,7 @@ class OrganizationController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Organizations/Create');
+        return Inertia::render('organizations/create');
     }
 
     /**
@@ -42,11 +46,7 @@ class OrganizationController extends Controller
     public function store(StoreOrganizationRequest $request): RedirectResponse
     {
         $organization = Organization::create($request->validated());
-
-        // Attach the creating user as a member (e.g., with 'admin' role)
         Auth::user()->organizations()->attach($organization->id, ['role' => 'admin']);
-
-        // Set the newly created organization as the current organization for the user
         Auth::user()->update(['current_organization_id' => $organization->id]);
 
         return redirect()->route('organizations.show', $organization)
@@ -58,16 +58,12 @@ class OrganizationController extends Controller
      */
     public function show(Organization $organization): Response
     {
-        // Apply global scope for multi-tenancy:
-        // Ensure the current user has access to this organization via the global scope
-        // This is handled by a global scope on your tenant-scoped models (e.g., Project, Task, Document).
-        // For the Organization model itself, you might need a different check or policy.
-        // For simplicity now, we assume if you can view it, you are a member.
+       
 
-        $organization->load('users'); // Load members for display
-        $projects = $organization->projects()->latest()->get(); // Example: Get projects for this organization
+        $organization->load('users'); 
+        $projects = $organization->projects()->with('creator')->get();
 
-        return Inertia::render('Organizations/Show', [
+        return Inertia::render('organizations/show', [
             'organization' => OrganizationResource::make($organization),
             'projects' => ProjectResource::collection($projects),
         ]);
@@ -79,7 +75,7 @@ class OrganizationController extends Controller
     public function edit(Organization $organization): Response
     {
         // Policy check will go here: ->authorize('update', $organization);
-        return Inertia::render('Organizations/Edit', [
+        return Inertia::render('organizations/edit', [
             'organization' => OrganizationResource::make($organization),
         ]);
     }
@@ -100,7 +96,7 @@ class OrganizationController extends Controller
      */
     public function destroy(Organization $organization): RedirectResponse
     {
-        // Policy check will go here: ->authorize('delete', $organization);
+        
         $organization->delete();
 
         // If the deleted organization was the user's current organization, unset it.
@@ -117,7 +113,7 @@ class OrganizationController extends Controller
      */
     public function switch(Organization $organization): RedirectResponse
     {
-        // Ensure the user is a member of this organization
+       
         if (!Auth::user()->organizations->contains($organization->id)) {
             abort(403, 'You are not a member of this organization.');
         }

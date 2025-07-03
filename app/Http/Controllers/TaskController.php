@@ -20,12 +20,11 @@ class TaskController extends Controller
      */
     public function index(Project $project): Response
     {
-        // Global scope on Task and Project models ensures user only accesses tasks
-        // within their current organization and associated with the given project.
+      
         $tasks = $project->tasks()->with(['assignedTo', 'createdBy'])->latest()->get();
 
-        return Inertia::render('Tasks/Index', [
-            'project' => $project->only('id', 'name', 'organization_id'), // Pass minimal project data
+        return Inertia::render('tasks/index', [
+            'project' => $project->only('id', 'name', 'organization_id'), 
             'tasks' => TaskResource::collection($tasks),
         ]);
     }
@@ -35,9 +34,9 @@ class TaskController extends Controller
      */
     public function create(Project $project): Response
     {
-        return Inertia::render('Tasks/Create', [
+        return Inertia::render('tasks/create', [
             'project' => $project->only('id', 'name', 'organization_id'),
-            // You might want to pass a list of users for assignment
+          
             'organizationUsers' => \App\Http\Resources\UserResource::collection(
                 $project->organization->users()->select('id', 'name')->get()
             ),
@@ -60,15 +59,14 @@ class TaskController extends Controller
      */
     public function show(Project $project, Task $task): Response
     {
-        // Global scope on Task and Project models handles multi-tenancy.
-        // Ensure the task belongs to the given project:
+       
         if ($task->project_id !== $project->id) {
             abort(404);
         }
 
         $task->load(['assignedTo', 'createdBy', 'project']);
 
-        return Inertia::render('Tasks/Show', [
+        return Inertia::render('tasks/show', [
             'project' => $project->only('id', 'name', 'organization_id'),
             'task' => TaskResource::make($task),
         ]);
@@ -82,8 +80,8 @@ class TaskController extends Controller
         if ($task->project_id !== $project->id) {
             abort(404);
         }
-        // Policy check will go here: ->authorize('update', $task);
-        return Inertia::render('Tasks/Edit', [
+      
+        return Inertia::render('tasks/edit', [
             'project' => $project->only('id', 'name', 'organization_id'),
             'task' => TaskResource::make($task),
             'organizationUsers' => \App\Http\Resources\UserResource::collection(
@@ -100,7 +98,7 @@ class TaskController extends Controller
         if ($task->project_id !== $project->id) {
             abort(404);
         }
-        // Global scope on Task and Project models handles multi-tenancy.
+        
         $task->update($request->validated());
 
         return redirect()->route('projects.show', $project)
@@ -115,8 +113,7 @@ class TaskController extends Controller
         if ($task->project_id !== $project->id) {
             abort(404);
         }
-        // Global scope on Task and Project models handles multi-tenancy.
-        // Policy check will go here: ->authorize('delete', $task);
+       
         $task->delete();
 
         return redirect()->route('projects.show', $project)

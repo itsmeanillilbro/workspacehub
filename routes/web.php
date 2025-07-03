@@ -17,25 +17,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-       // Organization Routes
+       
        Route::resource('organizations', OrganizationController::class);
        Route::post('organizations/{organization}/switch', [OrganizationController::class, 'switch'])->name('organizations.switch');
    
-       // Organization Members Routes (Nested under organizations)
        Route::prefix('organizations/{organization}')->name('organizations.')->group(function () {
            Route::resource('members', UserOrganizationController::class)->except(['show', 'edit']); // invite, update role, remove
        });
    
    
-       // Project Routes (These should now implicitly be scoped by current_organization_id due to global scopes)
        Route::resource('projects', ProjectController::class);
    
-       // Task Routes (Nested under projects)
        Route::prefix('projects/{project}')->name('projects.')->group(function () {
            Route::resource('tasks', TaskController::class);
        });
    
-       // Document Routes (Nested under projects)
        Route::prefix('projects/{project}')->name('projects.')->group(function () {
            Route::resource('documents', DocumentController::class);
            Route::get('documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download');
