@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
@@ -27,7 +28,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
    
    
        Route::resource('projects', ProjectController::class);
-   
+       Route::get('/invitations/{token}/accept', [InvitationController::class, 'accept'])->name('invitations.accept');
+       Route::post('/invitations/{token}/accept', [InvitationController::class, 'processAcceptance'])->name('invitations.processAcceptance');
        Route::prefix('projects/{project}')->name('projects.')->group(function () {
            Route::resource('tasks', TaskController::class);
        });

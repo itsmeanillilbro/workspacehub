@@ -14,7 +14,7 @@ interface OrganizationShowProps extends PageProps {
 }
 
 export default function OrganizationShow({ organization, projects }: OrganizationShowProps) {
-  
+    console.log('OrganizationShow component rendered with organization:', organization);
     const orgData = organization.data;
 
     const { flash } = usePage<OrganizationShowProps>().props;

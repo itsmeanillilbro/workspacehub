@@ -20,9 +20,16 @@ class OrganizationResource extends JsonResource
             'slug' => $this->slug,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'users_count' => $this->whenLoaded('users', fn() => $this->users->count()), 
-            'current_user_is_member' => $this->whenNotNull($request->user() ? $this->users->contains($request->user()) : null), 
-            'is_current_organization' => $this->whenNotNull($request->user() && $request->user()->current_organization_id === $this->id),
+            'users' => UserResource::collection($this->whenLoaded('users')),
+            'users_count' => $this->whenCounted('users'),
+            'current_user_is_member' => $this->when(
+                $request->user(),
+                fn() => $this->users->contains($request->user())
+            ),
+            'is_current_organization' => $this->when(
+                $request->user(),
+                fn() => $request->user()->current_organization_id === $this->id
+            ),
         ];
     }
 }
