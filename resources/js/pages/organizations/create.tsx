@@ -53,7 +53,7 @@ export default function CreateOrganization() {
                                         type="text"
                                         name="name"
                                         value={data.name}
-                                        className="focus-visible:ring-primary"
+                                        className="focus-visible:ring-primary mt-2"
                                         placeholder="e.g. Acme Corp"
                                         autoComplete="organization-name"
                                         onChange={(e) => setData('name', e.target.value)}

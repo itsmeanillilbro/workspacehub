@@ -37,8 +37,8 @@ export default function EditProject({ project }: ProjectEditProps) {
             <Head title={`Edit Project: ${project.name}`} />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
-                <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Edit Project: {project.name}</h2>
-                <Card className="max-w-2xl mx-auto">
+                <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight mx-auto">Edit Project: {project.name}</h2>
+                <Card className="w-xl mx-auto">
                     <CardHeader>
                         <CardTitle>Edit Project Details</CardTitle>
                         <CardDescription>Update the information for this project.</CardDescription>

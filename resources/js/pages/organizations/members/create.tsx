@@ -54,7 +54,7 @@ export default function CreateOrganizationMember({ organization }: OrganizationM
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Invite Member to ${orgData.name}`} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto justify-center mx-auto">
                 <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Invite Member to {orgData.name}</h2>
                 {flash.success && (
                     <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
@@ -71,7 +71,7 @@ export default function CreateOrganizationMember({ organization }: OrganizationM
                         <span className="block sm:inline">{flash.info}</span>
                     </div>
                 )}
-                <Card className="max-w-md mx-auto">
+                <Card className="max-w-md ">
                     <CardHeader>
                         <CardTitle>Invite New Member</CardTitle>
                         <CardDescription>Enter the email address of the user you want to invite.</CardDescription>
@@ -88,7 +88,7 @@ export default function CreateOrganizationMember({ organization }: OrganizationM
                                     className="mt-1 block w-full"
                                     autoComplete="email"
                                     onChange={(e) => setData('email', e.target.value)}
-                                    required
+                                 
                                 />
                                 <InputError message={errors.email} className="mt-2" />
                             </div>

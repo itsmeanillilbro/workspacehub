@@ -12,6 +12,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -76,27 +77,19 @@ class UserOrganizationController extends Controller
             // Attach the user to the organization with the specified role
             $organization->users()->attach($userToInvite->id, ['role' => $request->role]);
 
-            // OPTIONAL: Send an in-app notification to the user that they've been added.
-            // Example: $userToInvite->notify(new AddedToOrganization($organization));
 
             return redirect()->back()->with('success', 'Member added successfully!');
 
         } else {
-            // --- SCENARIO 2: User with this email does NOT exist ---
-
-            // Check if an invitation for this email already exists for this organization
             $existingInvitation = Invitation::where('organization_id', $organization->id)
                                             ->where('email', $request->email)
                                             ->whereNull('accepted_at') // Only consider unaccepted invitations
                                             ->first();
 
             if ($existingInvitation) {
-                // Optionally, resend the invitation or just inform the user
-                // For now, let's just inform that it's already sent
                 return redirect()->back()->with('info', 'An invitation has already been sent to this email address for this organization.');
             }
 
-            // Create a new invitation record
             $invitation = Invitation::create([
                 'organization_id' => $organization->id,
                 'email' => $request->email,
@@ -114,42 +107,39 @@ class UserOrganizationController extends Controller
     /**
      * Update a user's role within an organization.
      */
-    public function update(Request $request, Organization $organization, User $user): RedirectResponse
-    {
-        $request->validate(['role' => ['required', 'string', 'in:member,admin']]);
-        
-        // Nuclear option - combine all approaches
-        try {
-            // Approach 1: Sync without detaching
-            $organization->users()->syncWithoutDetaching([
-                $user->id => ['role' => $request->role]
-            ]);
-            
-            // Approach 2: Raw query as backup
-            if ($organization->users()->find($user->id)->pivot->role !== $request->role) {
-                \DB::table('organization_user')
-                   ->where('organization_id', $organization->id)
-                   ->where('user_id', $user->id)
-                   ->update(['role' => $request->role]);
-            }
-            
-            // Verify
-            $updatedRole = $organization->users()->find($user->id)->pivot->role;
-            if ($updatedRole !== $request->role) {
-                throw new \Exception("Role update failed");
-            }
-            
-            return back()->with('success', 'Role updated!');
-        } catch (\Exception $e) {
-            \Log::error("Role update failed", [
-                'error' => $e->getMessage(),
-                'organization' => $organization->id,
-                'user' => $user->id,
-                'request' => $request->all()
-            ]);
-            return back()->with('error', 'Failed to update role');
+    public function update(Request $request, Organization $organization, User $member): RedirectResponse
+{
+    $request->validate(['role' => ['required', 'string', 'in:member,admin']]);
+
+    try {
+        $pivotUser = $organization->users()->find($member->id);
+        if (!$pivotUser) {
+            throw new \Exception("User is not part of this organization");
         }
+
+        // Update role via syncWithoutDetaching
+        $organization->users()->syncWithoutDetaching([
+            $member->id => ['role' => $request->role]
+        ]);
+
+        // Confirm the role changed
+        $updatedRole = $organization->users()->find($member->id)->pivot->role;
+        if ($updatedRole !== $request->role) {
+            throw new \Exception("Role update failed, mismatch after update.");
+        }
+
+        return back()->with('success', 'Role updated!');
+    } catch (\Exception $e) {
+        Log::error("Role update failed", [
+            'error' => $e->getMessage(),
+            'organization' => $organization->id,
+            'user' => $member->id,
+            'request' => $request->all()
+        ]);
+        return back()->with('error', 'Failed to update role');
     }
+}
+
     /**
      * Remove a user from an organization.
      */

@@ -47,6 +47,7 @@ class Task extends Model
     {
         return $this->belongsTo(User::class, 'assigned_to_user_id');
     }
+    
 
     /**
      * Get the user who created this task (many-to-one inverse).

@@ -21,12 +21,14 @@ class UserResource extends JsonResource
             'current_organization_id' => $this->current_organization_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            $this->mergeWhen($this->pivot, [
-                'pivot' => [
-                    'role' => $this->pivot->role,
-                    // Add other pivot attributes if needed, e.g., 'created_at'
-                ],
-            ]),
+            $this->mergeWhen($this->pivot, function () {
+                return [
+                    'pivot' => [
+                        'role' => $this->pivot->role,
+                    ],
+                ];
+            }),
+            
         ];
     }
 }

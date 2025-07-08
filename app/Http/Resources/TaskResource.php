@@ -28,7 +28,7 @@ class TaskResource extends JsonResource
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
             'project' => ProjectResource::make($this->whenLoaded('project')),
-            'assigned_to' => UserResource::make($this->whenLoaded('assignedTo')), // Assuming assignedTo relationship exists
+            'assigned_to' => $this->assignedTo ? new UserResource($this->assignedTo) : null,
             'created_by' => UserResource::make($this->whenLoaded('createdBy')),
         ];
     }

@@ -40,6 +40,8 @@ class DocumentController extends Controller
         ]);
     }
 
+   
+
     /**
      * Store a newly created resource in storage.
      */
@@ -77,7 +79,7 @@ class DocumentController extends Controller
         $document->load('uploadedBy');
         return Inertia::render('documents/show', [
             'project' => $project->only('id', 'name', 'organization_id'),
-            'document' => DocumentResource::make($document),
+            'document' => DocumentResource::make($document)->resolve(),
         ]);
     }
 

@@ -15,7 +15,7 @@ class UpdateTaskRequest extends FormRequest
         // User must be authenticated, in the same organization as the task's project.
         return auth()->check()
             && $this->task->organization_id === auth()->user()->current_organization_id;
-            // Later: && auth()->user()->can('update', $this->task);
+        // Later: && auth()->user()->can('update', $this->task);
     }
 
     /**
@@ -32,12 +32,11 @@ class UpdateTaskRequest extends FormRequest
             'due_date' => ['nullable', 'date'],
             'priority' => ['nullable', 'integer', 'min:0', 'max:10'],
             'assigned_to_user_id' => [
-                'nullable',
-                'exists:users,id',
-                Rule::exists('organization_user')->where(function ($query) {
-                    $query->where('organization_id', auth()->user()->current_organization_id);
-                }),
-            ],
+    'nullable',
+    'exists:users,id',
+    Rule::exists('organization_user', 'user_id')->where('organization_id', auth()->user()->current_organization_id),
+],
+
         ];
     }
 }

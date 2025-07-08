@@ -36,8 +36,8 @@ export default function CreateDocument({ project }: DocumentCreateProps) {
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
                 <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Upload Document for {project.name}</h2>
-                <Card className="max-w-xl mx-auto">
-                    <CardHeader>
+                <Card className="w-xl mx-auto">
+                    <CardHeader className='text-center'>
                         <CardTitle>Upload New Document</CardTitle>
                         <CardDescription>Select a file to upload to this project.</CardDescription>
                     </CardHeader>

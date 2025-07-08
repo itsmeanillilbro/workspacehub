@@ -19,11 +19,7 @@ export default function OrganizationIndex({ organizations, currentOrganizationId
         { title: 'Organizations', active: true },
     ];
 
-    const handleDelete = (organization: Organization) => {
-        if (confirm(`Are you sure you want to delete the organization "${organization.name}"? This action cannot be undone.`)) {
-            router.delete(route('organizations.destroy', organization.id));
-        }
-    };
+
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -93,7 +89,7 @@ export default function OrganizationIndex({ organizations, currentOrganizationId
                                                     </DialogHeader>
                                                     <DialogFooter>
                                                         <Button variant="outline">Cancel</Button>
-                                                        <Button variant="destructive" onClick={() => handleDelete(org)}>
+                                                        <Button variant="destructive"  onClick={() => router.delete(route('organizations.destroy', org.id))}>
                                                             Delete
                                                         </Button>
                                                     </DialogFooter>

@@ -107,7 +107,14 @@ export interface Task {
     priority: number;
     created_at: string;
     updated_at: string;
-    assigned_to: User | null;
+    assigned_to?: {
+        data: {
+          id: number;
+          name: string;
+          email: string;
+        };
+      };
+      
     created_by: User;
     project?: Project;
 }
@@ -145,4 +152,8 @@ export type { OrganizationMembersIndexProps };
 
 interface OrganizationResponse {
   data: Organization[];
+}
+export interface TasksIndexProps extends PageProps {
+    project: Project; // No 'data' wrapper here
+    tasks: InertiaCollection<Task>;
 }

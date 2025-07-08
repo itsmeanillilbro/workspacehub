@@ -65,7 +65,7 @@ class OrganizationController extends Controller
 
         return Inertia::render('organizations/show', [
             'organization' => OrganizationResource::make($organization),
-            'projects' => ProjectResource::collection($projects),
+            'projects' => ProjectResource::collection($projects)->resolve(),
         ]);
     }
 

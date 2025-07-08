@@ -29,6 +29,7 @@ interface TaskEditProps {
 }
 
 export default function EditTask({ project, task, organizationUsers }: TaskEditProps) {
+    console.log({ task });
     const { data, setData, put, processing, errors, recentlySuccessful } = useForm({
         title: task.title,
         description: task.description || '',
@@ -50,15 +51,15 @@ export default function EditTask({ project, task, organizationUsers }: TaskEditP
         e.preventDefault();
         put(route('projects.tasks.update', { project: project.id, task: task.id }));
     };
-
+   
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Edit Task: ${task.title}`} />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
-                <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Edit Task: {task.title}</h2>
-                <Card className="max-w-2xl mx-auto">
-                    <CardHeader>
+                <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight mx-auto">Edit Task: {task.title}</h2>
+                <Card className="w-xl mx-auto">
+                    <CardHeader className='mx-auto'>
                         <CardTitle>Edit Task Details</CardTitle>
                         <CardDescription>Update the information for this task.</CardDescription>
                     </CardHeader>
@@ -130,15 +131,17 @@ export default function EditTask({ project, task, organizationUsers }: TaskEditP
                                 <Label htmlFor="assigned_to_user_id">Assigned To</Label>
                                 <Select
                                     value={data.assigned_to_user_id?.toString() || ''}
-                                    onValueChange={(value) => setData('assigned_to_user_id', value ? parseInt(value) : null)}
+                                    onValueChange={(value) => setData('assigned_to_user_id', value === 'none' ? null : parseInt(value))}
                                 >
-                                    <SelectTrigger id="assigned_to_user_id" className="w-full mt-1">
+                                    <SelectTrigger id="assigned_to_user_id" className="mt-1 w-full">
                                         <SelectValue placeholder="Select User (Optional)" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">Unassigned</SelectItem>
-                                        {organizationUsers.map(user => (
-                                            <SelectItem key={user.id} value={user.id.toString()}>{user.name}</SelectItem>
+                                        <SelectItem value="none">Unassigned</SelectItem>
+                                        {organizationUsers.map((user) => (
+                                            <SelectItem key={user.id} value={user.id.toString()}>
+                                                {user.name}
+                                            </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>

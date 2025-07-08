@@ -25,7 +25,6 @@ export default function OrganizationShow({ organization, projects }: Organizatio
     
         { title: orgData.name, active: true },
     ];
-
     const handleDeleteProject = (projectId: number) => {
         if (confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
             router.delete(route('projects.destroy', projectId));
@@ -123,14 +122,14 @@ export default function OrganizationShow({ organization, projects }: Organizatio
                                             <p className="text-sm text-gray-500 dark:text-gray-400">Status: {project.status}</p>
                                             <p className="text-sm text-gray-500 dark:text-gray-400">Created by: {project.creator.name}</p>
                                         </div>
-                                        <div className="flex gap-2">
+                                        <div className="flex gap-2 ">
                                             <Link href={route('projects.show', project.id)}>
-                                                <Button variant="outline" size="sm">View</Button>
+                                                <Button  variant="outline" size="sm">View</Button>
                                             </Link>
                                             <Link href={route('projects.edit', project.id)}>
-                                                <Button variant="outline" size="sm"><Edit className="h-4 w-4" /></Button>
+                                                <Button  className='cursor-pointer' variant="outline" size="sm"><Edit className="h-4 w-4" /></Button>
                                             </Link>
-                                            <Button variant="destructive" size="sm" onClick={() => handleDeleteProject(project.id)}>Delete</Button>
+                                            <Button  className='cursor-pointer' variant="destructive" size="sm" onClick={() => handleDeleteProject(project.id)}>Delete</Button>
                                         </div>
                                     </li>
                                 ))}

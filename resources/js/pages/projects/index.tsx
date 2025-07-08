@@ -20,11 +20,7 @@ export default function ProjectIndex({ projects }: ProjectsIndexProps) {
         { title: 'Projects', active: true },
     ];
 
-    const handleDelete = (projectId: number) => {
-        if (confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
-            router.delete(route('projects.destroy', projectId));
-        }
-    };
+  
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -65,14 +61,15 @@ export default function ProjectIndex({ projects }: ProjectsIndexProps) {
                                                 <Badge>{project.status}</Badge>
                                                 <div className="flex gap-2">
                                                     <Link href={route('projects.show', project.id)}>
-                                                        <Button variant="secondary" size="sm">View</Button>
+                                                        <Button className='cursor-pointer' variant="secondary" size="sm">View</Button>
                                                     </Link>
+                                                    
                                                     <Link href={route('projects.edit', project.id)}>
-                                                        <Button variant="outline" size="sm"><Edit className="h-4 w-4" /></Button>
+                                                        <Button className='cursor-pointer' variant="outline" size="sm"><Edit className="h-4 w-4" /></Button>
                                                     </Link>
                                                     <Dialog>
                                                         <DialogTrigger asChild>
-                                                            <Button variant="destructive" size="sm"><Trash2 className="h-4 w-4" /></Button>
+                                                            <Button  className='cursor-pointer' variant="destructive" size="sm"><Trash2 className="h-4 w-4" /></Button>
                                                         </DialogTrigger>
                                                         <DialogContent>
                                                             <DialogHeader>
@@ -84,7 +81,7 @@ export default function ProjectIndex({ projects }: ProjectsIndexProps) {
                                                             </DialogHeader>
                                                             <DialogFooter>
                                                                 <Button variant="outline">Cancel</Button>
-                                                                <Button variant="destructive" onClick={() => handleDelete(project.id)}>Delete</Button>
+                                                                <Button variant="destructive"   onClick={() => router.delete(route('projects.destroy', project.id))}>Delete</Button>
                                                             </DialogFooter>
                                                         </DialogContent>
                                                     </Dialog>

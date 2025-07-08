@@ -23,11 +23,8 @@ const mainNavItems: NavItem[] = [
         href: '/projects',
         icon: Folder,
     },
-    {
-        title: 'Tasks',
-        href: '/tasks', 
-        icon: ClipboardList,
-    },
+   
+    
 ];
 
 

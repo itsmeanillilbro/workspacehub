@@ -86,7 +86,7 @@ export default function CreateProject() {
                             </div>
 
                             <div className="flex items-center justify-end mt-4">
-                                <Button className="ms-4" disabled={processing}>
+                                <Button className="ms-4 cursor-pointer" disabled={processing}>
                                     Create Project
                                 </Button>
                             </div>

@@ -61,7 +61,7 @@ export default function EditOrganization({ organization }: OrganizationEditProps
                                         type="text"
                                         name="name"
                                         value={data.name}
-                                        className="focus-visible:ring-primary"
+                                        className="focus-visible:ring-primary mt-2"
                                         placeholder="Enter organization name"
                                         autoComplete="organization-name"
                                         onChange={(e) => setData('name', e.target.value)}
@@ -75,6 +75,7 @@ export default function EditOrganization({ organization }: OrganizationEditProps
                                     <Button
                                         type="button"
                                         variant="outline"
+                                        className='cursor-pointer'
                                         onClick={() => window.history.back()}
                                         disabled={processing}
                                     >
@@ -82,7 +83,7 @@ export default function EditOrganization({ organization }: OrganizationEditProps
                                     </Button>
                                     <Button 
                                         type="submit" 
-                                        className="w-full sm:w-auto"
+                                        className="w-full sm:w-auto cursor-pointer"
                                         disabled={processing}
                                     >
                                         {processing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

@@ -25,21 +25,22 @@ class StoreDocumentRequest extends FormRequest
      */
     public function rules(): array
     {
+        $this->merge([
+            'organization_id' => auth()->user()->current_organization_id,
+            'uploaded_by_user_id' => auth()->id(),
+        ]);
+    
         return [
-            'file' => ['required', 'file', 'max:10240'], // Max 10MB file size
-            'name' => ['nullable', 'string', 'max:255'], // Optional name, defaults to filename
+            'name' => ['nullable', 'string', 'max:255'],
+            'file' => ['required', 'file', 'max:10240'], // 10MB limit
+            'organization_id' => ['required', 'integer'],
+            'uploaded_by_user_id' => ['required', 'integer'],
         ];
     }
+    
 
     /**
      * Prepare the data for validation.
      */
-    protected function prepareForValidation(): void
-    {
-        $this->merge([
-            'organization_id' => auth()->user()->current_organization_id,
-            'project_id' => $this->route('project')->id,
-            'uploaded_by_user_id' => auth()->id(),
-        ]);
-    }
+   
 }

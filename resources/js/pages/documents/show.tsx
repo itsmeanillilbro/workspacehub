@@ -61,7 +61,7 @@ export default function DocumentShow({ project, document }: DocumentShowProps) {
                                         </DialogHeader>
                                         <DialogFooter>
                                             <Button variant="outline" onClick={() => router.visit(route('projects.documents.show', { project: project.id, document: document.id }))}>Cancel</Button>
-                                            <Button variant="destructive" onClick={handleDelete}>Delete</Button>
+                                            <Button variant="destructive" onClick={()=> router.delete(route('projects.documents.destroy',{project:project.id, document:document.id}))}>Delete</Button>
                                         </DialogFooter>
                                     </DialogContent>
                                 </Dialog>

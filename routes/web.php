@@ -33,6 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
        Route::prefix('projects/{project}')->name('projects.')->group(function () {
            Route::resource('tasks', TaskController::class);
        });
+
    
        Route::prefix('projects/{project}')->name('projects.')->group(function () {
            Route::resource('documents', DocumentController::class);

@@ -1,25 +1,18 @@
-import AppLayout from '@/layouts/app-layout';
-import { Head, useForm } from '@inertiajs/react';
+import InputError from '@/components/input-error'; // Corrected path
 import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import InputError from '@/components/input-error'; // Corrected path
-import { type PageProps, type Project, type User, type BreadcrumbItem } from '@/types';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
-
+import AppLayout from '@/layouts/app-layout';
+import { cn } from '@/lib/utils';
+import { type BreadcrumbItem, type Project, type User } from '@/types';
+import { Head, useForm } from '@inertiajs/react';
+import { format } from 'date-fns';
+import { Calendar as CalendarIcon } from 'lucide-react';
 
 interface TaskCreateProps {
     project: Project;
@@ -52,10 +45,10 @@ export default function CreateTask({ project, organizationUsers }: TaskCreatePro
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Create Task for ${project.name}`} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
-                <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Create Task for {project.name}</h2>
-                <Card className="max-w-2xl mx-auto">
-                    <CardHeader>
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <h2 className="text-xl leading-tight font-semibold text-gray-800 dark:text-gray-200">Create Task for {project.name}</h2>
+                <Card className="mx-auto w-xl">
+                    <CardHeader className='mx-auto' >
                         <CardTitle>New Task Details</CardTitle>
                         <CardDescription>Enter the details for your new task.</CardDescription>
                     </CardHeader>
@@ -70,7 +63,7 @@ export default function CreateTask({ project, organizationUsers }: TaskCreatePro
                                     value={data.title}
                                     className="mt-1 block w-full"
                                     onChange={(e) => setData('title', e.target.value)}
-                                    required
+                                    
                                 />
                                 <InputError message={errors.title} className="mt-2" />
                             </div>
@@ -88,14 +81,14 @@ export default function CreateTask({ project, organizationUsers }: TaskCreatePro
                                 <InputError message={errors.description} className="mt-2" />
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div>
                                     <Label htmlFor="status">Status</Label>
                                     <Select
                                         value={data.status}
                                         onValueChange={(value) => setData('status', value as 'pending' | 'in-progress' | 'completed' | 'blocked')}
                                     >
-                                        <SelectTrigger id="status" className="w-full mt-1">
+                                        <SelectTrigger id="status" className="mt-1 w-full">
                                             <SelectValue placeholder="Select Status" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -127,18 +120,21 @@ export default function CreateTask({ project, organizationUsers }: TaskCreatePro
                                 <Label htmlFor="assigned_to_user_id">Assigned To</Label>
                                 <Select
                                     value={data.assigned_to_user_id?.toString() || ''}
-                                    onValueChange={(value) => setData('assigned_to_user_id', value ? parseInt(value) : null)}
+                                    onValueChange={(value) => setData('assigned_to_user_id', value === 'none' ? null : parseInt(value))}
                                 >
-                                    <SelectTrigger id="assigned_to_user_id" className="w-full mt-1">
+                                    <SelectTrigger id="assigned_to_user_id" className="mt-1 w-full">
                                         <SelectValue placeholder="Select User (Optional)" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">Unassigned</SelectItem>
-                                        {organizationUsers.map(user => (
-                                            <SelectItem key={user.id} value={user.id.toString()}>{user.name}</SelectItem>
+                                        <SelectItem value="none">Unassigned</SelectItem>
+                                        {organizationUsers.map((user) => (
+                                            <SelectItem key={user.id} value={user.id.toString()}>
+                                                {user.name}
+                                            </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
+
                                 <InputError message={errors.assigned_to_user_id} className="mt-2" />
                             </div>
 
@@ -147,14 +143,14 @@ export default function CreateTask({ project, organizationUsers }: TaskCreatePro
                                 <Popover>
                                     <PopoverTrigger asChild>
                                         <Button
-                                            variant={"outline"}
+                                            variant={'outline'}
                                             className={cn(
-                                                "w-full justify-start text-left font-normal mt-1",
-                                                !data.due_date && "text-muted-foreground"
+                                                'mt-1 w-full justify-start text-left font-normal',
+                                                !data.due_date && 'text-muted-foreground',
                                             )}
                                         >
                                             <CalendarIcon className="mr-2 h-4 w-4" />
-                                            {data.due_date ? format(new Date(data.due_date), "PPP") : <span>Pick a date</span>}
+                                            {data.due_date ? format(new Date(data.due_date), 'PPP') : <span>Pick a date</span>}
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-auto p-0">
@@ -169,7 +165,7 @@ export default function CreateTask({ project, organizationUsers }: TaskCreatePro
                                 <InputError message={errors.due_date} className="mt-2" />
                             </div>
 
-                            <div className="flex items-center justify-end mt-4">
+                            <div className="mt-4 flex items-center justify-end">
                                 <Button className="ms-4" disabled={processing}>
                                     Create Task
                                 </Button>

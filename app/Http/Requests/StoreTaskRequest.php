@@ -26,32 +26,32 @@ class StoreTaskRequest extends FormRequest
      */
     public function rules(): array
     {
+        $this->merge([
+            'organization_id' => auth()->user()->current_organization_id,
+            'project_id' => $this->route('project')->id,
+            'created_by_user_id' => auth()->id(),
+        ]);
+    
         return [
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'status' => ['nullable', 'string', 'in:pending,in-progress,completed,blocked'],
             'due_date' => ['nullable', 'date'],
             'priority' => ['nullable', 'integer', 'min:0', 'max:10'],
-            'assigned_to_user_id' => [
-                'nullable',
-                'exists:users,id',
-                // Ensure assigned user is part of the current organization
-                Rule::exists('organization_user')->where(function ($query) {
-                    $query->where('organization_id', auth()->user()->current_organization_id);
-                }),
-            ],
+           'assigned_to_user_id' => [
+    'nullable',
+    'exists:users,id',
+    Rule::exists('organization_user', 'user_id')->where(function ($query) {
+        $query->where('organization_id', auth()->user()->current_organization_id);
+    }),
+],
+
+            // You can add these to ensure they're required or just let them pass through
+            'organization_id' => ['required', 'integer'],
+            'project_id' => ['required', 'integer'],
+            'created_by_user_id' => ['required', 'integer'],
         ];
     }
+    
 
-    /**
-     * Prepare the data for validation.
-     */
-    protected function prepareForValidation(): void
-    {
-        $this->merge([
-            'organization_id' => auth()->user()->current_organization_id,
-            'project_id' => $this->route('project')->id,
-            'created_by_user_id' => auth()->id(),
-        ]);
-    }
 }
